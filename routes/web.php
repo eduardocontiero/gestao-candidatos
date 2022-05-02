@@ -14,9 +14,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index']);
-Route::get('/create', [App\Http\Controllers\HomeController::class, 'create']);
+Route::get('/create', [App\Http\Controllers\HomeController::class, 'create'])->name('create');
 Route::post('/save', [App\Http\Controllers\HomeController::class, 'save']);
 Route::post('/{userId}/qualifications/save', [App\Http\Controllers\HomeController::class, 'saveQualifications']);
-Route::get('/edit/{id}', [App\Http\Controllers\HomeController::class, 'edit']);
-Route::post('/update/{id}', [App\Http\Controllers\HomeController::class, 'update']);
-Route::get('/delete/{id}', [App\Http\Controllers\HomeController::class, 'delete']);
+Route::get('/edit/{id}', [App\Http\Controllers\HomeController::class, 'edit'])->name('edit');
+Route::get('/delete/{id}', [App\Http\Controllers\HomeController::class, 'delete'])->name('delete');

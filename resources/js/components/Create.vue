@@ -55,13 +55,9 @@
                     >
                         <form method="post">
                             <div class="mb-3">
-                                <label
-                                    for="exampleInputEmail1"
-                                    class="form-label"
-                                    >Nome</label
-                                >
+                                <label class="form-label">Nome</label>
                                 <input
-                                    type="email"
+                                    type="text"
                                     class="form-control"
                                     name="name"
                                     v-model="user.name"
@@ -79,6 +75,9 @@
                                     name="email"
                                     v-model="user.email"
                                 />
+                                <div class="text-danger" v-if="errors.email">
+                                    {{ errors.email[0] }}
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Telefone</label>
@@ -88,11 +87,14 @@
                                     name="phone"
                                     v-model="user.phone"
                                 />
+                                <div class="text-danger" v-if="errors.phone">
+                                    {{ errors.phone[0] }}
+                                </div>
                             </div>
 
                             <button
                                 type="button"
-                                class="btn btn-primary"
+                                class="btn btn-primary mt-2"
                                 @click="_saveUser()"
                             >
                                 Salvar e continuar
@@ -105,15 +107,15 @@
                         role="tabpanel"
                         aria-labelledby="profile-tab"
                     >
-                        <h6>
-                            Qualificações profissionais
-                            
-                        </h6>
+                        <h5>Qualificações profissionais</h5>
                         <button
-                                class="btn btn-primary"
-                                @click="addProfessionalQualification"
-                            >Adicionar </button>
-                        <div class="mt-3 mb-3"
+                            class="btn btn-primary"
+                            @click="addProfessionalQualification"
+                        >
+                            Adicionar
+                        </button>
+                        <div
+                            class="mt-3 mb-3"
                             v-for="(
                                 value, counter
                             ) in professional_qualifications"
@@ -128,17 +130,17 @@
                             />
                         </div>
 
-                        <h6 class="mt-3">
-                            Qualificações acadêmicas
-                            
-                        </h6>
+                        <h5 class="mt-3">Qualificações acadêmicas</h5>
                         <button
-                                class="btn btn-primary"
-                                @click="addAcademicQualification"
-                            >Adicionar </button>
-                        <div class="mt-3 mb-3"
+                            class="btn btn-primary"
+                            @click="addAcademicQualification"
+                        >
+                            Adicionar
+                        </button>
+                        <div
+                            class="mt-3 mb-3"
                             v-for="(value, counter) in academic_qualifications"
-                            :key="'A'+counter"
+                            :key="'A' + counter"
                         >
                             <input
                                 type="email"
@@ -151,7 +153,7 @@
 
                         <button
                             type="button"
-                            class="btn btn-primary"
+                            class="btn btn-primary mt-3"
                             :disabled="!user.id"
                             @click="_saveQualifications()"
                         >
@@ -164,14 +166,53 @@
                         role="tabpanel"
                         aria-labelledby="contact-tab"
                     >
-                        <button
-                            type="button"
-                            class="btn btn-primary"
-                            :disabled="!user.id"
-                            @click="_saveUser()"
-                        >
-                            Salvar e continuar
-                        </button>
+                        <form method="post" class="mb-3">
+                            <div class="mb-3">
+                                <label class="form-label">Usuário</label>
+                                <input
+                                    type="email"
+                                    class="form-control"
+                                    name="name"
+                                    v-model="user.username"
+                                    placeholder="Nome Completo"
+                                />
+                                <div class="text-danger" v-if="errors.username">
+                                    {{ errors.username[0] }}
+                                </div>
+                                <label class="form-label">Senha</label>
+                                <input
+                                    type="password"
+                                    class="form-control"
+                                    name="password"
+                                    v-model="user.password"
+                                    placeholder="Senha"
+                                />
+                                <div class="text-danger" v-if="errors.password">
+                                    {{ errors.password[0] }}
+                                </div>
+                                 <label class="form-label">Confirmar Senha</label>
+                            <input
+                                type="password"
+                                class="form-control"
+                                name="password_confirmation"
+                                v-model="user.password_confirmation"
+                                placeholder="Confirmar Senha"
+                            />
+                            <div class="text-danger" v-if="errors.password">
+                                {{ errors.password[1] }}
+                            </div>
+
+                            <button
+                                type="button"
+                                class="btn btn-primary mt-3"
+                                :disabled="!user.id"
+                                @click="_saveUser()"
+                            >
+                                Salvar e continuar
+                            </button>
+                            </div>
+                           
+                        </form>
                     </div>
                 </div>
             </div>
@@ -194,13 +235,13 @@ export default {
             professional_qualifications: [
                 {
                     description: "",
-                    type: "",
+                    type: "PROFISSIONAL",
                 },
             ],
             academic_qualifications: [
                 {
                     description: "",
-                    type: "",
+                    type: "ACADEMICO",
                 },
             ],
         };
@@ -210,44 +251,41 @@ export default {
             this.isLoading = true;
             sendRequest("/save", this.user)
                 .then((response) => {
-                    console.log(response);
-                    if (response.data.success) {
+                   
+                        this.isLoading = false;
                         this.user = response.data.user;
-                        setTimeout(() => {
-                           
-                            this.nextTab();
-                        }, 500);
-                    }
+                        if(response.data.user.username != null){
+                            window.location.href = '/';
+                        }else{
+                             this.nextTab();
+                        }
+                       
                 })
                 .catch((error) => {
                     this.isLoading = false;
-                    if (error.response.status == 422) {
-                        this.errors = error.response.data.message;
-                        console.log(this.errors);
-                    }
-                }).finally(() => this.isLoading = false);;
+
+                    this.errors = error.response.data.errors;
+                    console.log(this.errors);
+                });
         },
         _saveQualifications() {
             this.isLoading = true;
-             sendRequest(`${this.user.id}/qualifications/save`, {'professional_qualifications': this.professional_qualifications, 'academic_qualifications': this.academic_qualifications})
+            sendRequest(`${this.user.id}/qualifications/save`, {
+                professional_qualifications: this.professional_qualifications,
+                academic_qualifications: this.academic_qualifications,
+            })
                 .then((response) => {
-                    console.log(response);
-                    if (response.data.success) {
-                        this.professional_qualifications = response.data.professional_qualifications;
-                        this.academic_qualifications = response.data.academic_qualifications;
-                        setTimeout(() => {
-                          
-                            this.nextTab();
-                        }, 500);
-                    }
+                    this.isLoading = false;
+                    this.nextTab();
+                    
+                  
                 })
                 .catch((error) => {
                     this.isLoading = false;
-                    if (error.response.status == 422) {
-                        this.errors = error.response.data.message;
-                        console.log(this.errors);
-                    }
-                }).finally(() => this.isLoading = false);
+
+                  this.errors = error.response.data.errors;
+                  console.log(this.errors);
+                });
         },
         addProfessionalQualification() {
             this.professional_qualifications.push({
@@ -261,10 +299,14 @@ export default {
                 type: "ACADEMICO",
             });
         },
-         nextTab() {
-           let $active = $('.nav-tabs li>button.active');
-           
-           $($active).parent().next().find('button[data-bs-toggle="tab"]').click();
+        nextTab() {
+            let $active = $(".nav-tabs li>button.active");
+
+            $($active)
+                .parent()
+                .next()
+                .find('button[data-bs-toggle="tab"]')
+                .click();
         },
     },
     mounted() {

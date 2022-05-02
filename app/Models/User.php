@@ -46,12 +46,12 @@ class User extends Authenticatable
     ];
 
 
-    public function professional_qualitifications()
+    public function professional_qualifications()
     {
         return $this->hasMany('App\Models\UserQualification')->where('type','=', 'PROFISSIONAL');
     }
 
-    public function academic_qualitifications()
+    public function academic_qualifications()
     {
     
         return $this->hasMany('App\Models\UserQualification')->where('type','=', 'ACADEMICO');

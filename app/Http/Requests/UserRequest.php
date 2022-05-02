@@ -29,20 +29,27 @@ class UserRequest extends FormRequest
     {
         $rules = [
             'name' => 'required',
-            'email' => 'required',
-            'phone' => 'required'
         ];
 
         if($this->id){
             $rules += ['username' => 'required'];
             $rules += ['password' => 'required|confirmed'];
         }
+        if(!$this->phone){
+            $rules += ['email' => 'required'];
+        }
+
+        if(!$this->email){
+            $rules += ['phone' => 'required'];
+        }
+
+
 
         return $rules;
     }
 
     public function failedValidation(Validator $validator) {
-        throw new HttpResponseException(response()->json(['success' => false, 'errors'=>Arr::flatten($validator->messages()->get('*'))], 422));
+        throw new HttpResponseException(response()->json(['success' => false, 'errors'=> $validator->errors()], 422));
 
     }
 }
